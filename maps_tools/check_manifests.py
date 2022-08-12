@@ -63,7 +63,7 @@ def cli(file, out_file, overwrite, verbose):
                 manifest_data = manifest.json()
                 out_row['num_canvases'] = len(manifest_data['sequences'][0]['canvases'])
                 logging.debug('checking image')
-                image = r_session.head(line["image_uri"])
+                image = r_session.get(line["image_uri"])
                 out_row['image_uri'] = line['image_uri']
                 out_row['image_status'] = image.status_code
                 out_row['image_time'] = image.elapsed
