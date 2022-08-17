@@ -54,7 +54,7 @@ def cli(file, out_file, overwrite, verbose):
                 'datetime': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()),
                 'manifest_url': line['manifest_url']
             }
-            manifest = r_session.get(line["manifest_url"])
+            manifest = r_session.get(line["manifest_url"], timeout=40.0)
             out_row['manifest_status'] = manifest.status_code
             out_row['manifest_time'] = manifest.elapsed
             if manifest.status_code == 200:
@@ -63,7 +63,7 @@ def cli(file, out_file, overwrite, verbose):
                 manifest_data = manifest.json()
                 out_row['num_canvases'] = len(manifest_data['sequences'][0]['canvases'])
                 logging.debug('checking image')
-                image = r_session.get(line["image_uri"])
+                image = r_session.get(line["image_uri"], timeout=40.0)
                 out_row['image_uri'] = line['image_uri']
                 out_row['image_status'] = image.status_code
                 out_row['image_time'] = image.elapsed
@@ -71,7 +71,7 @@ def cli(file, out_file, overwrite, verbose):
             else:
                 logging.debug("nope")
             writer.writerow(out_row)
-            time.sleep(0.5)
+            time.sleep(1.5)
 
 if __name__ == "__main__":
     cli()
