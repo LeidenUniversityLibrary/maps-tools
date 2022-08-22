@@ -28,15 +28,17 @@ def cli(input_dir: pathlib.Path, output_dir: pathlib.Path, metadata: pathlib.Pat
             input_file = f"{file_record['georef_klokan'][0]}/{file_record['georef_klokan']}.json"
             input_path = input_dir / pathlib.Path(input_file)
             print('Opening', input_path)
+            image_uri = file_record['image_uri'][:-24]
+            image_id = image_uri[42:]
             with input_path.open(encoding='utf-8', mode='r') as in_file:
                 record = json.load(in_file)
-            new_record = convert_to_allmaps(record)
+            new_record = convert_to_allmaps(record, image_id, file_record['georef_klokan'], image_uri)
             with (output_dir / input_path.name).open(mode='w') as out_file:
                 json.dump(new_record, out_file, indent=2)
             print('Done!')
 
 
-def convert_to_allmaps(record: dict) -> dict:
+def convert_to_allmaps(record: dict, image_id: str, georef_id: str, image_uri: str) -> dict:
     """
     Convert a record to an Allmaps record.
     {
@@ -154,10 +156,10 @@ def convert_to_allmaps(record: dict) -> dict:
     }
     """
     result = {
-        "id": "FIXME",
+        "id": georef_id,
         "image": {
-            "id": "FIXME",
-            "uri": "FIXME",
+            "id": image_id,
+            "uri": image_uri,
             "type": "ImageService2",
             "width": record["map"]["image"]["width"],
             "height": record["map"]["image"]["height"]
