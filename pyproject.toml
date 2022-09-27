@@ -23,7 +23,20 @@ dependencies = [
     "click~=8.1",
     "requests~=2.0",
 ]
+[project.optional-dependencies]
+dev = [
+  "pylint",
+  "pytest",
+  "pydocstringformatter",
+  "mypy",
+  "types-requests",
+]
 
 [project.urls]
 "Homepage" = "https://gitlab.services.universiteitleiden.nl/ub-leiden/maps-tools"
 "Bug Tracker" = "https://gitlab.services.universiteitleiden.nl/ub-leiden/maps-tools/issues"
+
+[tool.hatch.envs.test]
+features = [
+  "dev",
+]
