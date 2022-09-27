@@ -32,7 +32,7 @@ def cli(input_dir: pathlib.Path, output_dir: pathlib.Path, metadata: pathlib.Pat
             image_id = image_uri[42:]
             with input_path.open(encoding='utf-8', mode='r') as in_file:
                 record = json.load(in_file)
-            new_record = convert_to_allmaps(record, image_id, file_record['georef_klokan'], image_uri)
+            new_record = convert_to_iiif(record, file_record['georef_klokan'], image_uri)
             with (output_dir / input_path.name).open(mode='w') as out_file:
                 json.dump(new_record, out_file, indent=2)
             print('Done!')
@@ -177,7 +177,83 @@ def convert_to_allmaps(record: dict, image_id: str, georef_id: str, image_uri: s
     result["pixelMask"] = pixel_mask
     return result
 
+def convert_to_iiif(record: dict, georef_id: str, image_uri: str) -> dict:
+    """
+    Convert a record to an annotation on a IIIF image.
 
+    Args:
+      record: enhanced Klokan record.
+      georef_id: annotation identifier.
+      image_uri: IIIF Image base URI.
+    Returns:
+      AnnotationPage containing a georeferencing Annotation.
+    """
+    result = {
+      "@context": ["http://www.w3.org/ns/anno.jsonld"],
+      "type": "AnnotationPage",
+      "items": [
+        {
+          "id": georef_id,
+          "type": "Annotation",
+          "@context": [
+            "http://www.w3.org/ns/anno.jsonld",
+            "http://geojson.org/geojson-ld/geojson-context.jsonld",
+            "http://iiif.io/api/presentation/3/context.json"
+          ],
+          "motivation": "georeferencing",
+          "target": {
+            "type": "Image", # FIXME
+            "source": image_uri + "/full/full/0/default.jpg",
+            "service": [
+              {
+                "@id": image_uri,
+                "type": "ImageService2"
+              }
+            ],
+            "selector": {
+              "type": "SvgSelector",
+              "value": create_svg_selector(record)
+            }
+          },
+          "body": {
+            "type": "FeatureCollection",
+            "purpose": "gcp-georeferencing",
+            "transformation": {
+              "type": "polynomial",
+              "order": 0
+            },
+            "features": create_gcp_features(record)
+          }
+        }
+      ]
+    }
+
+    return result
+
+
+def create_svg_selector(record: dict) -> str:
+    """Create an SVG selector with image dimensions and polygon."""
+    points = " ".join([",".join(map(str, point)) for point in record["new_cutlines"]])
+    height = record["map"]["image"]["height"]
+    width = record["map"]["image"]["width"]
+    return f'<svg width=\"{width}\" height=\"{height}\"><polygon points=\"{points}\" /></svg>'
+
+def create_gcp_features(record: dict) -> list:
+    """Create a list of Features for ground control points."""
+    gcps = []
+    for control_point in record["new_gcps"]:
+        gcp = {
+                "type": "Feature",
+                "properties": {
+                  "pixelCoords": control_point["pixel"]
+                },
+                "geometry": {
+                  "type": "Point",
+                  "coordinates": control_point["location"]
+                }
+              }
+        gcps.append(gcp)
+    return gcps
 
 if __name__ == "__main__":
     cli()
