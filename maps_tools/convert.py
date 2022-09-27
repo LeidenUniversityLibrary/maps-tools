@@ -1,8 +1,6 @@
 # SPDX-FileCopyrightText: 2022 Leiden University Libraries <beheer@library.leidenuniv.nl>
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""
-Convert Klokan annotations to IIIF annotations.
-"""
+"""Convert Klokan annotations to IIIF annotations."""
 
 import json
 import click
@@ -16,9 +14,7 @@ import logging
 @click.option('-i', '--input-dir', type=click.Path(exists=True, dir_okay=True, path_type=pathlib.Path))
 @click.option('-m', '--metadata', type=click.Path(exists=True, file_okay=True, path_type=pathlib.Path))
 def cli(input_dir: pathlib.Path, output_dir: pathlib.Path, metadata: pathlib.Path):
-    """
-    Convert georeference data in given directories to IIIF annotations
-    """
+    """Convert georeference data in given directories to IIIF annotations."""
     if not output_dir.exists():
         print('Creating', output_dir)
         output_dir.mkdir(parents=True)

@@ -1,8 +1,6 @@
 # SPDX-FileCopyrightText: 2022 Leiden University Libraries <beheer@library.leidenuniv.nl>
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""
-Check that manifests and images are available.
-"""
+"""Check that manifests and images are available."""
 import glob
 import json
 import requests
@@ -33,7 +31,7 @@ USER_AGENT = 'maps_tools/0.0.1; https://gitlab.services.universiteitleiden.nl/ub
     help='Output file path')
 @click.argument('file', required=True, type=click.Path(exists=True, file_okay=True))
 def cli(file, out_file, overwrite, verbose):
-    """Check that each manifest and image resolves"""
+    """Check that each manifest and image resolves."""
     if verbose:
         logging.basicConfig(level=logging.DEBUG)
     else:
