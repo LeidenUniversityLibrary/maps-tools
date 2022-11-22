@@ -22,7 +22,7 @@ OUT_FIELDS = [
     'image_status',
     'image_time',
 ]
-USER_AGENT = 'maps_tools/0.0.1; https://gitlab.services.universiteitleiden.nl/ub-leiden/maps-tools'
+USER_AGENT = 'maps_tools/0.1.0; https://github.com/LeidenUniversityLibrary/maps-tools'
 
 @click.command()
 @click.option('-v', '--verbose', is_flag=True, help='Produce more log messages')
