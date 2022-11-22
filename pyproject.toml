@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "maps_tools"
-version = "0.0.1"
+version = "0.1.0"
 authors = [
   { name="Ben Companjen", email="ben@companjen.name" },
 ]
@@ -23,7 +23,20 @@ dependencies = [
     "click~=8.1",
     "requests~=2.0",
 ]
+[project.optional-dependencies]
+dev = [
+  "pylint",
+  "pytest",
+  "pydocstringformatter",
+  "mypy",
+  "types-requests",
+]
 
 [project.urls]
-"Homepage" = "https://gitlab.services.universiteitleiden.nl/ub-leiden/maps-tools"
-"Bug Tracker" = "https://gitlab.services.universiteitleiden.nl/ub-leiden/maps-tools/issues"
+"Homepage" = "https://github.com/LeidenUniversityLibrary/maps-tools"
+"Bug Tracker" = "https://github.com/LeidenUniversityLibrary/maps-tools/issues"
+
+[tool.hatch.envs.test]
+features = [
+  "dev",
+]
