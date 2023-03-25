@@ -13,7 +13,11 @@ import logging
     show_default=True, default='./output', help='Directory to store converted files')
 @click.option('-i', '--input-dir', type=click.Path(exists=True, dir_okay=True, path_type=pathlib.Path))
 @click.option('-m', '--metadata', type=click.Path(exists=True, file_okay=True, path_type=pathlib.Path))
-def cli(input_dir: pathlib.Path, output_dir: pathlib.Path, metadata: pathlib.Path):
+@click.option('-n', '--annos-per-page', type=int, default=100,
+              help='Number of Annotations per AnnotationPage. Currently ignored.')
+@click.option('-b', '--base-uri', type=str, required=True)
+def cli(input_dir: pathlib.Path, output_dir: pathlib.Path, metadata: pathlib.Path, annos_per_page: int,
+    base_uri: str):
     """Convert georeference data in given directories to IIIF annotations."""
     if not output_dir.exists():
         print('Creating', output_dir)
@@ -21,15 +25,19 @@ def cli(input_dir: pathlib.Path, output_dir: pathlib.Path, metadata: pathlib.Pat
     with metadata.open(mode='r', encoding='utf-8', newline='') as metadata_file:
         reader = csv.DictReader(metadata_file)
         for file_record in reader:
-            input_file = f"{file_record['georef_klokan'][0]}/{file_record['georef_klokan']}.json"
+            georef_id = file_record['georef_klokan']
+            input_file = f"{georef_id[0]}/{georef_id}.json"
             input_path = input_dir / pathlib.Path(input_file)
             print('Opening', input_path)
             image_uri = file_record['image_uri'][:-24]
             image_id = image_uri[42:]
             with input_path.open(encoding='utf-8', mode='r') as in_file:
                 record = json.load(in_file)
-            new_record = convert_to_iiif(record, file_record['georef_klokan'], image_uri)
-            with (output_dir / input_path.name).open(mode='w') as out_file:
+            new_record = convert_to_iiif(record, input_file, image_uri, base_uri)
+            output_filename = output_dir / georef_id[0] / input_path.name
+            if not output_filename.parent.exists():
+                output_filename.parent.mkdir(parents=True)
+            with output_filename.open(mode='w') as out_file:
                 json.dump(new_record, out_file, indent=2)
             print('Done!')
 
@@ -173,7 +181,7 @@ def convert_to_allmaps(record: dict, image_id: str, georef_id: str, image_uri: s
     result["pixelMask"] = pixel_mask
     return result
 
-def convert_to_iiif(record: dict, georef_id: str, image_uri: str) -> dict:
+def convert_to_iiif(record: dict, georef_id: str, image_uri: str, base_uri: str) -> dict:
     """
     Convert a record to an annotation on a IIIF image.
 
@@ -187,9 +195,10 @@ def convert_to_iiif(record: dict, georef_id: str, image_uri: str) -> dict:
     result = {
       "@context": ["http://www.w3.org/ns/anno.jsonld"],
       "type": "AnnotationPage",
+      "id": f"{base_uri}/{georef_id}",
       "items": [
         {
-          "id": georef_id,
+          "id": f"{base_uri}/{georef_id}#anno",
           "type": "Annotation",
           "@context": [
             "http://www.w3.org/ns/anno.jsonld",
