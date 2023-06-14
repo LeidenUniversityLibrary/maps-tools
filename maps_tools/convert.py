@@ -211,7 +211,7 @@ def convert_to_iiif(record: dict, georef_id: str, image_uri: str, base_uri: str)
             "source": image_uri + "/full/full/0/default.jpg",
             "service": [
               {
-                "@id": image_uri,
+                "id": image_uri,
                 "type": "ImageService2"
               }
             ],
