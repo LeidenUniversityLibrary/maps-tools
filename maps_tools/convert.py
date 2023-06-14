@@ -250,7 +250,7 @@ def create_gcp_features(record: dict) -> list:
         gcp = {
                 "type": "Feature",
                 "properties": {
-                  "pixelCoords": control_point["pixel"]
+                  "resourceCoords": control_point["pixel"]
                 },
                 "geometry": {
                   "type": "Point",
