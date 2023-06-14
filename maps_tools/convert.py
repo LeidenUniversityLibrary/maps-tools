@@ -11,8 +11,8 @@ import logging
 @click.command()
 @click.option('-o', '--output-dir', type=click.Path(dir_okay=True, path_type=pathlib.Path), required=True,
     show_default=True, default='./output', help='Directory to store converted files')
-@click.option('-i', '--input-dir', type=click.Path(exists=True, dir_okay=True, path_type=pathlib.Path))
-@click.option('-m', '--metadata', type=click.Path(exists=True, file_okay=True, path_type=pathlib.Path))
+@click.option('-i', '--input-dir', type=click.Path(exists=True, dir_okay=True, path_type=pathlib.Path), required=True)
+@click.option('-m', '--metadata', type=click.Path(exists=True, file_okay=True, path_type=pathlib.Path), required=True)
 @click.option('-n', '--annos-per-page', type=int, default=100,
               help='Number of Annotations per AnnotationPage. Currently ignored.')
 @click.option('-b', '--base-uri', type=str, required=True)
