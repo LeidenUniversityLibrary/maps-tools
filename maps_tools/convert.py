@@ -225,7 +225,7 @@ def convert_to_iiif(record: dict, georef_id: str, image_uri: str, base_uri: str)
             "purpose": "gcp-georeferencing",
             "transformation": {
               "type": "polynomial",
-              "order": 0
+              "order": 1
             },
             "features": create_gcp_features(record)
           }
